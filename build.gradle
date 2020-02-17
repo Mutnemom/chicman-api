@@ -41,14 +41,12 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 
     /* for ktor */
+    implementation "io.ktor:ktor-gson:$ktor_version"
+    implementation "io.ktor:ktor-auth-jwt:$ktor_version"
     implementation "io.ktor:ktor-server-netty:$ktor_version"
-    implementation "io.ktor:ktor-client-gson:$ktor_version"
     implementation "ch.qos.logback:logback-classic:$logback_version"
 
     /* for database */
     implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: "$mariadb_version"
     implementation "org.jetbrains.exposed:exposed:$exposed_version"
-
-    /* for jwt */
-    implementation "io.jsonwebtoken:jjwt:$jjwt_version"
 }
