@@ -16,8 +16,18 @@ object MemberService {
                 select { (this@with.username eq username) and (this@with.password eq password) }
                     .forEach {
                         JwtProvider
-                            .createToken(it[uid], it[this.username], it[profileName], it[type])
-                            .apply { response.add(LoginPasswordResponse(it[this@with.username], this)) }
+                            .createToken(it[uid], it[type], it[this.username], it[profileName])
+                            .apply {
+                                response.add(
+                                    LoginPasswordResponse(
+                                        it[uid],
+                                        it[type],
+                                        it[this@with.username],
+                                        it[profileName],
+                                        this
+                                    )
+                                )
+                            }
                     }
             }
         }
