@@ -1,6 +1,7 @@
 package com.chicman.api
 
 import com.chicman.api.controller.AuthenticationController
+import com.chicman.api.controller.MemberController
 import com.chicman.api.security.jwt.JwtProvider
 import io.ktor.application.Application
 import io.ktor.application.install
@@ -48,7 +49,10 @@ fun Application.main() {
 
         authenticate {
             post("$API_V1/auth/login/password") { AuthenticationController(this).login() }
+            get("$API_V1/members/profiles") { MemberController(this).getProfiles() }
         }
+
+        post("$API_V1/members/verify") { MemberController(this).verify() }
     }
 
 }

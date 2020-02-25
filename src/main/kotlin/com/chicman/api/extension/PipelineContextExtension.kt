@@ -12,6 +12,7 @@ import io.ktor.util.pipeline.PipelineContext
 suspend fun <R> PipelineContext<Unit, ApplicationCall>.errorAware(block: suspend () -> R): R? = try {
     block()
 } catch (e: Throwable) {
+    e.printStackTrace()
     call.respondText(
         "$ERROR_PREFIX${e.message}$ERROR_POSTFIX",
         ContentType.Application.Json,

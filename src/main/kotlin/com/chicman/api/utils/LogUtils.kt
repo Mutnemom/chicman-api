@@ -12,4 +12,8 @@ object LogUtils {
         logger.info(message)
     }
 
+    fun error(message: String) {
+        logger.error(message)
+    }
+
 }

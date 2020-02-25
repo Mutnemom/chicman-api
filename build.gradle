@@ -12,6 +12,7 @@ buildscript {
         /* for database */
         exposed_version = '0.8.5'
         mariadb_version = '2.2.2'
+        jodatime_version = '2.9.9'
 
         /* for jwt */
         jjwt_version = '0.9.1'
@@ -49,4 +50,5 @@ dependencies {
     /* for database */
     implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: "$mariadb_version"
     implementation "org.jetbrains.exposed:exposed:$exposed_version"
+    implementation "joda-time:joda-time:$jodatime_version"
 }

@@ -8,4 +8,6 @@ object Member : Table("member") {
     val password = varchar("password", length = 45)
     val profileName = varchar("profile_name", length = 45)
     val type = varchar("type", length = 6)
+    val createAt = datetime("create_at")
+    val activateAt = datetime("activate_at")
 }

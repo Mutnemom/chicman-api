@@ -22,8 +22,12 @@ object JwtProvider {
         uid: String? = UUID.randomUUID().toString(),
         type: String? = GUEST_USER,
         username: String? = null,
-        profileName: String? = null
+        profileName: String? = null,
+        createAt: String? = null,
+        activateAt: String? = null
     ): String = JWT.create()
+        .withClaim("activateAt", activateAt)
+        .withClaim("createAt", createAt)
         .withClaim("username", username)
         .withClaim("profile", profileName)
         .withClaim("type", type)
