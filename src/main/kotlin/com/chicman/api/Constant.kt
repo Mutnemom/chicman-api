@@ -14,3 +14,9 @@ const val GUEST_USER = "guest"
 const val ERROR_PREFIX = "{\"error\": \""
 const val ERROR_POSTFIX = "\"}"
 const val MESSAGE_UNAUTHORIZED = "Invalid username/password supplied"
+const val MESSAGE_USERNAME_NOT_AVAILABLE = "Username is not available"
+const val MESSAGE_FAILED_TO_INSERT_MEMBER = "Failed to insert new member"
+
+/* for http redirect message */
+const val REDIRECT_PREFIX = "{\"redirectUrl\": \""
+const val REDIRECT_POSTFIX = ERROR_POSTFIX

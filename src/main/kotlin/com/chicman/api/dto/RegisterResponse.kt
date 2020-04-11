@@ -1,5 +1,5 @@
 package com.chicman.api.dto
 
-data class LoginPasswordResponse(
+data class RegisterResponse(
     val accessToken: String
 )

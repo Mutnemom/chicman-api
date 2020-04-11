@@ -1,10 +1,13 @@
 package com.chicman.api.controller
 
-import com.chicman.api.ERROR_POSTFIX
-import com.chicman.api.ERROR_PREFIX
+import com.chicman.api.MESSAGE_FAILED_TO_INSERT_MEMBER
 import com.chicman.api.MESSAGE_UNAUTHORIZED
+import com.chicman.api.MESSAGE_USERNAME_NOT_AVAILABLE
 import com.chicman.api.dto.LoginPasswordRequest
+import com.chicman.api.dto.RegisterRequest
 import com.chicman.api.extension.errorAware
+import com.chicman.api.extension.respondErrorJson
+import com.chicman.api.extension.respondRedirect
 import com.chicman.api.security.jwt.JwtProvider
 import com.chicman.api.service.MemberService
 import com.chicman.api.utils.LogUtils
@@ -35,22 +38,46 @@ class AuthenticationController(private val context: PipelineContext<Unit, Applic
 
     suspend fun login() {
         LogUtils.info(context.call.request.path())
-
         context.errorAware {
             context.call.receive<LoginPasswordRequest>()
                 .apply {
                     val resp = MemberService.getUsers(username, password)
                     when {
-                        resp.isNullOrEmpty() -> context.call.respondText(
-                            "$ERROR_PREFIX$MESSAGE_UNAUTHORIZED$ERROR_POSTFIX",
-                            ContentType.Application.Json,
-                            HttpStatusCode.Unauthorized
-                        )
+                        resp.isNullOrEmpty() -> context.call
+                            .respondErrorJson(MESSAGE_UNAUTHORIZED, HttpStatusCode.Unauthorized)
                         else -> context.call.respond(resp)
                     }
                 }
         }
+        LogUtils.info("${context.call.response.status()?.value}")
+    }
 
+    suspend fun register() {
+        LogUtils.info(context.call.request.path())
+        context.errorAware {
+            context.call.receive<RegisterRequest>()
+                .apply {
+                    when {
+                        MemberService.isExistingUsername(username) -> context.call.respondErrorJson(
+                            MESSAGE_USERNAME_NOT_AVAILABLE,
+                            HttpStatusCode.UnprocessableEntity
+                        )
+                        else -> {
+                            /* persist new account */
+                            val newMember =
+                                MemberService.createMember(username, password, profileName)
+
+                            when (newMember) {
+                                null -> context.call.respondErrorJson(
+                                    MESSAGE_FAILED_TO_INSERT_MEMBER,
+                                    HttpStatusCode.InternalServerError
+                                )
+                                else -> context.call.respondRedirect(redirectUrl ?: "")
+                            }
+                        }
+                    }
+                }
+        }
         LogUtils.info("${context.call.response.status()?.value}")
     }
 

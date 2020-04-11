@@ -49,10 +49,12 @@ fun Application.main() {
 
         authenticate {
             post("$API_V1/auth/login/password") { AuthenticationController(this).login() }
+            post("$API_V1/auth/register") { AuthenticationController(this).register() }
+
             get("$API_V1/members/profiles") { MemberController(this).getProfiles() }
+            post("$API_V1/members/activate") { MemberController(this).activate() }
         }
 
-        post("$API_V1/members/verify") { MemberController(this).verify() }
     }
 
 }
