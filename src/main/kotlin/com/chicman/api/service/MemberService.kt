@@ -10,13 +10,39 @@ import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.sql.update
+import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import java.util.*
 
 object MemberService {
 
-    fun activateUser(verifier: String): MembersActivateResponse? = try {
-        MembersActivateResponse(verifier)
+    fun activateAccount(memberId: String, isAdmin: Boolean): MembersActivateResponse? = try {
+        var token: String? = null
+        transaction {
+            with(Member) {
+                update({ uid eq memberId }) {
+                    it[activateAt] = DateTime(Date().time)
+                    if (isAdmin) it[type] = "admin"
+                }
+                select { (uid eq memberId) }
+                    .first()
+                    .also {
+                        if (it[activateAt] > it[createAt]) {
+                            token = JwtProvider.createToken(
+                                it[uid],
+                                it[type],
+                                it[this.username],
+                                it[profileName],
+                                it[createAt].toDateTime(DateTimeZone.UTC).toString(),
+                                it[activateAt].toDateTime(DateTimeZone.UTC).toString()
+                            )
+                        }
+                    }
+            }
+        }
+
+        MembersActivateResponse(token!!)
     } catch (e: Throwable) {
         e.printStackTrace()
         null

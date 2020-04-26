@@ -39,7 +39,7 @@ object MailUtils {
         }
 
         val verificationToken = JwtProvider.createVerificationToken(memberId, createDate, expired)
-        val confirmLink = "http://$host/account/accept/?m=$verificationToken"
+        val confirmLink = "http://$host/account/accept?m=$verificationToken"
 
         JavaMailSenderImpl().apply {
             val properties = Properties().apply {

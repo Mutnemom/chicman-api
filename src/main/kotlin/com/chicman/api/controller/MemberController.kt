@@ -23,7 +23,11 @@ class MemberController(private val context: PipelineContext<Unit, ApplicationCal
         context.errorAware {
             try {
                 context.call.receive<MembersActivateRequest>().apply {
-                    MemberService.activateUser(verifier).let { resp ->
+
+                    val memberId = context.call.parameters["id"]
+                        ?: throw IllegalArgumentException("Parameter id not found")
+
+                    MemberService.activateAccount(memberId, isAdmin).let { resp ->
                         when (resp) {
                             null -> context.call.respondErrorJson(
                                 "Failed to activate user",
@@ -37,7 +41,13 @@ class MemberController(private val context: PipelineContext<Unit, ApplicationCal
                 e.printStackTrace()
 
                 val errorMessage = when (e) {
-                    is IllegalArgumentException -> "Required argument not found"
+                    is IllegalArgumentException -> {
+                        if (e.message != null && e.message!!.startsWith("Parameter id")) {
+                            e.message!!
+                        } else {
+                            "Required argument not found"
+                        }
+                    }
                     else -> e.message ?: "-"
                 }
 

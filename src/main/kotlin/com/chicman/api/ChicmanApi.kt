@@ -16,6 +16,7 @@ import io.ktor.gson.gson
 import io.ktor.routing.Routing
 import io.ktor.routing.get
 import io.ktor.routing.post
+import io.ktor.routing.put
 import java.text.DateFormat
 
 @Suppress("unused")
@@ -52,7 +53,7 @@ fun Application.main() {
             post("$API_V1/auth/register") { AuthenticationController(this).register() }
 
             get("$API_V1/members/profiles") { MemberController(this).getProfiles() }
-            post("$API_V1/members/activate") { MemberController(this).activate() }
+            put("$API_V1/members/{id}/activate") { MemberController(this).activate() }
         }
 
     }
