@@ -1,5 +1,6 @@
 package com.chicman.api.utils
 
+import com.chicman.api.security.jwt.JwtProvider
 import com.google.gson.internal.bind.util.ISO8601Utils
 import io.ktor.utils.io.charsets.name
 import org.springframework.mail.javamail.JavaMailSenderImpl
@@ -11,24 +12,34 @@ import java.util.*
 object MailUtils {
 
     fun sendAccountActivationMail(host: String, memberId: String, createAt: String) {
-        LogUtils.error("start create email process")
+        LogUtils.info("start create account confirmation email process")
 
         val receiver = "tt_yordkam@hotmail.com"
         val subject = "First Mail From API"
         val msg1 = "คุณได้ใช้อีเมลนี้ลงทะเบียนใช้งานเว็บไซต์ www.chicman.com"
-        val msg2 = "กรุณาคลิกลิงค์ด้านล่างเพื่อยืนยันการลงทะเบียนภายใน"
-        val expiryDate = Date()
+        val msg2 = "กรุณาคลิกลิงค์ด้านล่างเพื่อยืนยันการลงทะเบียนภายใน 48 ชม."
 
-        val generatedTime = try {
-            ISO8601Utils.parse(createAt, ParsePosition(0)).time / 1000
+        val createDate = try {
+            ISO8601Utils.parse(createAt, ParsePosition(0))
         } catch (e: Throwable) {
             e.printStackTrace()
-            expiryDate.time / 1000
+            null
+        } ?: run {
+            LogUtils.error("failed to create confirmation email")
+            return
         }
 
-        val confirmLink = "$host/account/accept/$generatedTime?id=$memberId"
+        val expired = createDate.let {
+            Calendar.getInstance()
+                .apply {
+                    time = it
+                    add(Calendar.HOUR, 48)
+                }
+                .time
+        }
 
-        LogUtils.error(Charsets.UTF_8.name)
+        val verificationToken = JwtProvider.createVerificationToken(memberId, createDate, expired)
+        val confirmLink = "http://$host/account/accept/?m=$verificationToken"
 
         JavaMailSenderImpl().apply {
             val properties = Properties().apply {
@@ -57,8 +68,10 @@ object MailUtils {
                             msg1 +
                             "<br />" +
                             msg2 +
-                            " " +
-                            SimpleDateFormat("dd MMM yyyy HH:mm:ss").format(expiryDate) +
+                            "<br />" +
+                            SimpleDateFormat("dd MMM yyyy HH:mm:ss").format(createDate) +
+                            "<br />" +
+                            SimpleDateFormat("dd MMM yyyy HH:mm:ss").format(expired) +
                             "<br />" +
                             "<br />" +
                             "<a href=" + confirmLink + ">" + confirmLink + "</a>" +
@@ -68,6 +81,7 @@ object MailUtils {
             }.also {
                 it.addTo(receiver)
                 send(message)
+                LogUtils.info("mail sending - done")
             }
         }
     }

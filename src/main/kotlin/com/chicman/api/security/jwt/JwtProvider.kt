@@ -37,4 +37,13 @@ object JwtProvider {
         .withIssuer(ISSUER)
         .sign(algorithm)
 
+    fun createVerificationToken(memberId: String, createAt: Date, expiresAt: Date): String =
+        JWT.create()
+            .withClaim("memberId", memberId)
+            .withAudience(AUDIENCE)
+            .withIssuedAt(createAt)
+            .withExpiresAt(expiresAt)
+            .withIssuer(ISSUER)
+            .sign(algorithm)
+
 }
