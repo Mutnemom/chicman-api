@@ -88,7 +88,7 @@ class AuthenticationController(private val context: PipelineContext<Unit, Applic
         context.call.respondRedirect(url ?: "")
         url?.also {
             withContext(Dispatchers.IO) {
-                MailUtils.sendAccountActivationMail(it, member.uid, member.createAt)
+                MailUtils.sendAccountActivationMail(it, member)
             }
         }
     }
