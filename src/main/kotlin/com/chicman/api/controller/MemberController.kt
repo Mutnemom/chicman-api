@@ -4,7 +4,6 @@ import com.chicman.api.dto.MembersActivateRequest
 import com.chicman.api.extension.errorAware
 import com.chicman.api.extension.getUidClaim
 import com.chicman.api.extension.respondErrorJson
-import com.chicman.api.extension.valueString
 import com.chicman.api.service.MemberService
 import com.chicman.api.utils.LogUtils
 import com.google.gson.JsonParseException
@@ -62,7 +61,7 @@ class MemberController(private val context: PipelineContext<Unit, ApplicationCal
         errorAware {
             call.apply {
                 val claim = getUidClaim()
-                val memberId = claim.valueString ?: throw JsonParseException("extract claim uid")
+                val memberId = claim.asString() ?: throw JsonParseException("extract claim uid")
                 respond(MemberService.getProfiles(memberId)!!)
             }
         }
